@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TaskRunnerExplorer;
+using MonoDevelop.Core;
 
 namespace MonoDevelop.GulpTaskRunner
 {
@@ -50,9 +51,12 @@ namespace MonoDevelop.GulpTaskRunner
 
 			var root = new TaskRunnerNode ("Gulp Task Runner");
 
+			var tasksNode = new TaskRunnerNode (GettextCatalog.GetString ("Tasks", false));
+			root.Children.Add (tasksNode);
+
 			foreach (string task in await GulpCommandRunner.FindGulpTasks (workingDirectory)) {
-				root.Children.Add (new TaskRunnerNode (task, true) {
-					Description = string.Format ("Runs Gulp task {0}", task),
+				tasksNode.Children.Add (new TaskRunnerNode (task, true) {
+					Description = GettextCatalog.GetString ("Runs Gulp task {0}", task),
 					Command = new TaskRunnerCommand (workingDirectory, "gulp", task)
 				});
 			}
