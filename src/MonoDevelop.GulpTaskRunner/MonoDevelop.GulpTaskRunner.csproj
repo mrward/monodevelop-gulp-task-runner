@@ -41,6 +41,9 @@
     <Compile Include="MonoDevelop.GulpTaskRunner\GulpTaskRunnerProvider.cs" />
     <Compile Include="MonoDevelop.GulpTaskRunner\GulpTaskRunnerConfig.cs" />
     <Compile Include="MonoDevelop.GulpTaskRunner\GulpCommandRunner.cs" />
+    <Compile Include="MonoDevelop.GulpTaskRunner\JsonTasksReader.cs" />
+    <Compile Include="MonoDevelop.GulpTaskRunner\GulpTaskDependencies.cs" />
+    <Compile Include="MonoDevelop.GulpTaskRunner\GulpTaskNode.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\MonoDevelop.GulpTaskRunner.addin.xml">

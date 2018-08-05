@@ -1,5 +1,5 @@
 ﻿//
-// GulpCommandRunner.cs
+// GulpTaskDependencies.cs
 //
 // Author:
 //       Matt Ward <matt.ward@microsoft.com>
@@ -24,46 +24,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MonoDevelop.Core;
-using MonoDevelop.Core.Execution;
+using Newtonsoft.Json;
 
 namespace MonoDevelop.GulpTaskRunner
 {
-	class GulpCommandRunner
+	class GulpTaskDependencies
 	{
-		public static async Task<GulpTaskDependencies> FindGulpTasks (string workingDirectory)
-		{
-			var outputBuilder = new StringBuilder ();
-			using (var stringWriter = new StringWriter (outputBuilder)) {
-				ProcessWrapper process = Runtime.ProcessService.StartProcess (
-					"gulp",
-					"--tasks-json",
-					workingDirectory,
-					stringWriter,
-					null,
-					null);
-
-				await process.Task;
-
-				if (process.ExitCode != 0) {
-					return null;
-				}
-
-				string json = outputBuilder.ToString ();
-				try {
-					return JsonTasksReader.Read (json);
-				} catch (Exception ex) {
-					LoggingService.LogError (string.Format ("Unable to read 'gulp --tasks-json': {0}", json), ex);
-				}
-
-				return null;
-			}
-		}
+		[JsonProperty ("nodes")]
+		public GulpTaskNode[] Nodes { get; set; }
 	}
 }

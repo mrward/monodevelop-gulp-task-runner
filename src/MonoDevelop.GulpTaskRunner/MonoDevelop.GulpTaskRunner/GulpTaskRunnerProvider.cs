@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TaskRunnerExplorer;
+using MonoDevelop.Core;
 
 namespace MonoDevelop.GulpTaskRunner
 {
@@ -44,20 +45,33 @@ namespace MonoDevelop.GulpTaskRunner
 			});
 		}
 
-		async Task<ITaskRunnerNode> LoadHierarchy (string configPath)
+		static async Task<ITaskRunnerNode> LoadHierarchy (string configPath)
 		{
 			string workingDirectory = Path.GetDirectoryName (configPath);
 
 			var root = new TaskRunnerNode ("Gulp Task Runner");
 
-			foreach (string task in await GulpCommandRunner.FindGulpTasks (workingDirectory)) {
-				root.Children.Add (new TaskRunnerNode (task, true) {
-					Description = string.Format ("Runs Gulp task {0}", task),
-					Command = new TaskRunnerCommand (workingDirectory, "gulp", task)
-				});
+			GulpTaskDependencies dependencies = await GulpCommandRunner.FindGulpTasks (workingDirectory);
+			if (dependencies != null) {
+				var tasksNode = new TaskRunnerNode (GettextCatalog.GetString ("Tasks", false));
+				root.Children.Add (tasksNode);
+				AddNodes (tasksNode, dependencies.Nodes, workingDirectory);
 			}
 
 			return root;
+		}
+
+		static void AddNodes (TaskRunnerNode parent, GulpTaskNode[] nodes, string workingDirectory)
+		{
+			foreach (GulpTaskNode node in nodes) {
+				var runnerNode = new TaskRunnerNode (node.Label, true) {
+					Description = string.Format ("Runs Gulp task {0}", node.Label),
+					Command = new TaskRunnerCommand (workingDirectory, "gulp", node.Label)
+				};
+				parent.Children.Add (runnerNode);
+
+				AddNodes (runnerNode, node.Nodes, workingDirectory);
+			}
 		}
 	}
 }
